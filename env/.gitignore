@@ -1,0 +1,30 @@
+# Ignore the entire virtual environment *.env
+*.env
+
+# Ignore specific directories within the virtual environment (e.g., site-packages)
+Lib/
+Scripts/
+# Ignore large model files
+env/mysite/mysite/models/*.h5
+
+mysite/mysite/models/
+share/
+
+# Ignore large model files
+mysite/mysite/models/*.h5
+mysite/mysite/models/*.json
+# Ignore all .pyc files, which are compiled Python files
+*.pyc
+
+# Ignore the settings.py file if you don't want to track it in version control
+mysite/mysite/settings.py
+
+# Other common Python ignores
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/bin/
+env/lib/
+env/include/
+env/share/
