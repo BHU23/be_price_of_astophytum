@@ -2,9 +2,10 @@ from django.utils import timezone
 import pytz
 from rest_framework import generics, serializers,permissions,status
 from rest_framework.response import Response
-from .models import HistoryPredictions, Predictions, Class, Price,CustomUser,HistoryPrompt,Role,Style
-from .serializers import PriceSerializer, ClassSerializer, HistoryPredictionsSerializer, PredictionsSerializer,CustomUserSerializer,HistoryPromptSerializer,StyleSerializer,RoleSerializer
-from .utils import process_image,convert_image,specail_image,analyze_image
+from .models import HistoryPredictions, Predictions, Class, Price,CustomUser
+from .serializers import PriceSerializer, ClassSerializer, HistoryPredictionsSerializer, PredictionsSerializer,CustomUserSerializer
+from .sevices.cactus_model_sevice import process_image,convert_image,specail_image
+from .sevices.gemini_sevice import analyze_image
 import logging
 from rest_framework.authtoken.models import Token 
 from rest_framework.views import APIView
@@ -19,6 +20,7 @@ from django.contrib.auth import login
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics, permissions
 
 logger = logging.getLogger('mylogger')
 class ExampleView(APIView):
@@ -184,7 +186,7 @@ class HistoryPredictionsListCreate(generics.ListCreateAPIView):
             raise serializers.ValidationError({"image": "This field is required."})
         
         image_new = convert_image(image)
-        prediction_value = analyze_image(image_new)
+        prediction_value,uploaded_file = analyze_image(image_new)
         logger.info("prediction_value: %s", prediction_value)
         # Respond based on the prediction value
         if prediction_value == 2000:
@@ -371,66 +373,3 @@ class FacebookLogin(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-class HistoryPromptListCreate(generics.ListCreateAPIView):
-    queryset = HistoryPrompt.objects.all()
-    serializer_class = HistoryPromptSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user_role = self.request.user.role
-        
-        # Filter by role if the user is not an Admin
-        if user_role != 'Admin':
-            queryset = queryset.filter(user=self.request.user)  # Filter by logged-in user
-
-        # Additional filtering by role and style if provided as query parameters
-        role_id = self.request.query_params.get('role_id', None)
-        style_id = self.request.query_params.get('style_id', None)
-
-        if role_id:
-            queryset = queryset.filter(role_id=role_id)
-        if style_id:
-            queryset = queryset.filter(style_id=style_id)
-
-        return queryset
-
-class HistoryPromptDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = HistoryPrompt.objects.all()
-    serializer_class = HistoryPromptSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user_role = self.request.user.role
-        if user_role == 'Admin':
-            return queryset
-        return queryset.filter(user=self.request.user)
-    
-class RoleListCreate(generics.ListCreateAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Adjust permissions as needed
-
-class RoleDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Adjust permissions as needed
-
-    def get_queryset(self):
-        return super().get_queryset()
-    
-from rest_framework import generics, permissions
-
-class StyleListCreate(generics.ListCreateAPIView):
-    queryset = Style.objects.all()
-    serializer_class = StyleSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Adjust permissions as needed
-
-class StyleDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Style.objects.all()
-    serializer_class = StyleSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Adjust permissions as needed
-
-    def get_queryset(self):
-        return super().get_queryset()

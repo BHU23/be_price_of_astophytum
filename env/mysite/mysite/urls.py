@@ -15,9 +15,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from api import views
-
+from django.urls import path
+from api import views 
+from api.view.historyPrompt import (
+    HistoryPromptDetail, 
+    HistoryPromptListCreate,
+    RoleListCreate, 
+    RoleDetail, 
+    StyleListCreate, 
+    StyleDetail, 
+)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/prices/', views.PriceListCreate.as_view(), name='price-list-create'),
@@ -36,11 +43,11 @@ urlpatterns = [
     path('api/user/profile/', views.UserProfileView.as_view(), name='user-profile-detail'),
     path('api/profile/create/', views.UserProfileCreateView.as_view(), name='user-profile-create'),
     path('api/profile/<int:pk>/', views.UserProfileRetrieveUpdateDeleteView.as_view(), name='user-profile-retrieve-update-delete'),
-    path('api/history-prompts/', views.HistoryPromptListCreate.as_view(), name='history-prompt-list-create'),
-    path('api/history-prompts/<int:pk>/', views.HistoryPromptDetail.as_view(), name='history-prompt-detail'),
-    path('api/roles/', views.RoleListCreate.as_view(), name='role-list-create'),
-    path('api/roles/<int:pk>/', views.RoleDetail.as_view(), name='role-detail'),
-    path('api/styles/', views.StyleListCreate.as_view(), name='style-list-create'),
-    path('api/styles/<int:pk>/', views.StyleDetail.as_view(), name='style-detail'),
+    path('api/history-prompts/', HistoryPromptListCreate.as_view(), name='history-prompt-list-create'),
+    path('api/history-prompts/<int:pk>/', HistoryPromptDetail.as_view(), name='history-prompt-detail'),
+    path('api/roles/', RoleListCreate.as_view(), name='role-list-create'),
+    path('api/roles/<int:pk>/', RoleDetail.as_view(), name='role-detail'),
+    path('api/styles/', StyleListCreate.as_view(), name='style-list-create'),
+    path('api/styles/<int:pk>/', StyleDetail.as_view(), name='style-detail'),
     path('auth/facebook/', views.FacebookLogin.as_view(), name='facebook-login'),
 ]
