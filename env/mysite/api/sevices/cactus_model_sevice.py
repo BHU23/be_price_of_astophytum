@@ -145,7 +145,7 @@ def convert_image(base64_image):
             base64_image = base64_image.split(',')[1]
 
         image_data = base64.b64decode(base64_image)
-        logger.info(f"image_data: {image_data}")
+        # logger.info(f"image_data: {image_data}")
 
         try:
             image = Image.open(BytesIO(image_data)).convert('RGB')

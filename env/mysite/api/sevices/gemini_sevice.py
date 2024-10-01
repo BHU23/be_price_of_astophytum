@@ -64,16 +64,29 @@ def analyze_image(image_data):
 
 def generated_post(history_prompt: HistoryPrompt, uploaded_file): 
     prompt = (
-        f"You are {history_prompt.role_id.name}, do in task [{history_prompt.prompt}]. "
+        f"You are {history_prompt.role_id.name} in Astro asres Nudum, do in task [{history_prompt.prompt}]. "
         "Astro asres Nudum have. "
         f"The type (ลักษณะ) are [{history_prompt.classes}]. "
-        f"And the price is [{history_prompt.price}]. "
-        f"Your style is [{history_prompt.style_id.name}]. "
-        "Please describe the item for posting on Facebook with 4-8 hashtags: "
-        "based on the item image details, along with the mandatory hashtags: #classes, #nudum, and #Astro asres."
-        "The description should be written in Thai language."
+    )
+    if history_prompt.price and "ขาย" in history_prompt.prompt:
+        prompt += f"And the price is [{history_prompt.price}]. "
+
+    if history_prompt.role_id.name == "ขาย":
+        prompt += "ขายแล้วนะ! สนใจติดต่อได้เลยจ้า 🪴🌵 "
+    elif history_prompt.role_id.name == "ผู้ซื้อ":
+        prompt += "กำลังตามหา หากใครมีรุ่นนี้ติดต่อมาได้เลย! "
+    elif history_prompt.role_id.name == "รีวิว":
+        prompt += "รีวิวสินค้าตัวนี้: ความสวยงาม สไตล์สนุกสนาน สุดคุ้ม! "
+
+    prompt += (
+        f"Please describe the item for posting on Facebook style text is [{history_prompt.style_id.name}]. "
+        "with 4-8 hashtags: "
+        "based on the item image details, along with the mandatory hashtags: #classes, #nudum, and #Astro asres. "
+        "The description should be written in Thai language. "
         "Keep specific product terms in English where appropriate, such as hashtags: #classes, #nudum, and #Astro asres."
     )
+
+
     logger.info(f"prompt: {prompt}", exc_info=True)
     result = model.generate_content([uploaded_file, "\n\n", prompt])
 

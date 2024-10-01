@@ -64,7 +64,7 @@ class HistoryPromptListCreate(generics.ListCreateAPIView):
         if prediction_value == 2000:
             response_data = generated_post(history_prompt, uploaded_file)  
             response = self.save_history_prompt(history_prompt, response_data)  
-            logger.info("Response: %s", response)
+            # logger.info("Response: %s", response)
             return Response(response, status=status.HTTP_201_CREATED)
 
         elif prediction_value in [3000, 3001, 4000]:
